@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 // 1 START GET REQUEST FOR EXCEL SHEET
 app.get('/getexcel', (req, res) => {
     client.connect(err => {
-        const collection = client.db("onlineStore").collection("excel3");
+        const collection = client.db("onlineStore").collection("excel");
         collection.find().toArray((err, documents) => {
             if (err) {
                 console.log(err);
