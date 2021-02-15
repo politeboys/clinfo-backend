@@ -14,7 +14,22 @@ app.get("/", (req, res) => {
     res.send("Hello Word second")
 });
 
-
+// 3 START GET REQUEST FOR ADD TO CARD
+app.get('/getaddtocard', (req, res) => {
+    client.connect(err => {
+        const collection = client.db("onlineStore").collection("addtocard");
+        collection.find().toArray((err, documents) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                res.send(documents)
+            }
+        })
+        // client.close();
+    });
+})
+// END OF GET REQUEST FOR ADD TO CARD
 
 
 
