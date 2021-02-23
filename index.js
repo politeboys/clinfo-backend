@@ -98,6 +98,58 @@ app.post('/postbuylead', (requ, res) => {
 
 
 
+// 2.2 START update increment REQUEST FOR buying LEAD
+app.post('/incrementbuylead', (requ, res) => {
+    const user = requ.body
+    const email = user.email
+    const quantity = user.quantity
+    console.log(user)
+
+    client.connect(err => {
+        const collection = client.db("onlineStore").collection("buylead");
+        collection.update({email},{ $inc: { quantity: quantity} }, (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log("user", user);
+            }
+        })
+        client.close();
+    });
+    res.send(user)
+})
+// 2.1 END update increment REQUEST FOR buying LEAD
+
+
+
+
+// 2.3 START update Decrement REQUEST FOR buying LEAD
+app.post('/decrementbuylead', (requ, res) => {
+    const user = requ.body
+    const email = user.email
+    const selected = user.selected
+    console.log(user)
+
+    client.connect(err => {
+        const collection = client.db("onlineStore").collection("buylead");
+        collection.update({email},{ $inc: { quantity: -selected} }, (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log("user", user);
+            }
+        })
+        client.close();
+    });
+    res.send(user)
+})
+// 2.1 END update Decrement REQUEST FOR buying LEAD
+
+
+
+ 
 // 3 START GET REQUEST FOR ADD TO CARD
 app.get('/getaddtocard', (req, res) => {
     client.connect(err => {
@@ -122,6 +174,7 @@ app.get('/getaddtocard', (req, res) => {
 // 3.1 START POST REQUEST FOR ADD TO CARD
 app.post('/postaddtocard', (requ, res) => {
     const user = requ.body
+
     client.connect(err => {
         const collection = client.db("onlineStore").collection("addtocard");
         collection.insertOne(user, (err, res) => {
@@ -141,10 +194,38 @@ app.post('/postaddtocard', (requ, res) => {
 
 
 
+// 3.2 END OF UPDATE REQUEST FOR ADD TO CARD
+app.post('/updateaddtocard', (requ, res) => {
+    const user = requ.body
+    const email = user.email
+    const data = user.selected
+
+    client.connect(err => {
+        const collection = client.db("onlineStore").collection("addtocard");
+        collection.update({ email }, {
+            $addToSet: {
+                selected: {
+                    $each: data
+                }
+            }
+        }, (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log("user", user);
+            }
+        })
+        client.close();
+    });
+    res.send("Bangladesh", user)
+})
+// END OF UPDATE REQUEST FOR ADD TO CARD
+
 
 
 
 let port = process.env.PORT || 4000;
 app.listen(port, () => {
-    console.log("Listening to the port",port);
+    console.log("Listening to the port", port);
 })
