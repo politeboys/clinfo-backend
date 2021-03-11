@@ -4,9 +4,13 @@ const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient;
 const app = express()
 app.use(cors())
-app.use(bodyParser.json())
+// app.use(bodyParser.json())
 const uri = "mongodb+srv://mukimbilla:alsk@1234@cluster0.x1mdc.mongodb.net/<dbname>?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true });
+
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json());
 
 
 
@@ -107,7 +111,7 @@ app.post('/incrementbuylead', (requ, res) => {
 
     client.connect(err => {
         const collection = client.db("onlineStore").collection("buylead");
-        collection.update({email},{ $inc: { quantity: quantity} }, (err, res) => {
+        collection.update({ email }, { $inc: { quantity: quantity } }, (err, res) => {
             if (err) {
                 console.log(err);
             }
@@ -133,7 +137,7 @@ app.post('/decrementbuylead', (requ, res) => {
 
     client.connect(err => {
         const collection = client.db("onlineStore").collection("buylead");
-        collection.update({email},{ $inc: { quantity: -selected} }, (err, res) => {
+        collection.update({ email }, { $inc: { quantity: -selected } }, (err, res) => {
             if (err) {
                 console.log(err);
             }
@@ -149,7 +153,7 @@ app.post('/decrementbuylead', (requ, res) => {
 
 
 
- 
+
 // 3 START GET REQUEST FOR ADD TO CARD
 app.get('/getaddtocard', (req, res) => {
     client.connect(err => {
@@ -174,6 +178,7 @@ app.get('/getaddtocard', (req, res) => {
 // 3.1 START POST REQUEST FOR ADD TO CARD
 app.post('/postaddtocard', (requ, res) => {
     const user = requ.body
+    // user.date = new Date()
 
     client.connect(err => {
         const collection = client.db("onlineStore").collection("addtocard");
@@ -196,16 +201,24 @@ app.post('/postaddtocard', (requ, res) => {
 
 // 3.2 END OF UPDATE REQUEST FOR ADD TO CARD
 app.post('/updateaddtocard', (requ, res) => {
-    const user = requ.body
-    const email = user.email
-    const data = user.selected
+    const allData = requ.body
+    const email = allData.userUID
+    const data = allData.usersSavedData
+    const date = allData.date
+    const selectedAmaunt = allData.selectedAmaunt
 
     client.connect(err => {
         const collection = client.db("onlineStore").collection("addtocard");
-        collection.update({ email }, {
+        collection.update({ userUID: email }, {
             $addToSet: {
-                selected: {
-                    $each: data
+                usersSavedData: {
+                    $each: data,
+                },
+                date: {
+                    $each: date,
+                },
+                selectedAmaunt: {
+                    $each: selectedAmaunt,
                 }
             }
         }, (err, res) => {
@@ -213,7 +226,7 @@ app.post('/updateaddtocard', (requ, res) => {
                 console.log(err);
             }
             else {
-                console.log("user", user);
+                console.log("user", data);
             }
         })
         client.close();
