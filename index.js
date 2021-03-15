@@ -82,6 +82,7 @@ app.get('/getbuylead', (req, res) => {
 // 2.1 START POST REQUEST FOR buying LEAD
 app.post('/postbuylead', (requ, res) => {
     const user = requ.body
+    user.date = new Date()
     client.connect(err => {
         const collection = client.db("onlineStore").collection("buylead");
         collection.insertOne(user, (err, res) => {
@@ -155,10 +156,12 @@ app.post('/decrementbuylead', (requ, res) => {
 
 
 // 3 START GET REQUEST FOR ADD TO CARD
-app.get('/getaddtocard', (req, res) => {
+app.get('/getaddtocard/:userUID', (req, res) => {
+    const userUID = req.params.userUID
+    
     client.connect(err => {
         const collection = client.db("onlineStore").collection("addtocard");
-        collection.find().toArray((err, documents) => {
+        collection.find({userUID}).toArray((err, documents) => {
             if (err) {
                 console.log(err);
             }
